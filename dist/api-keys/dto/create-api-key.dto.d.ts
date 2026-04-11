@@ -1,0 +1,6 @@
+export declare class CreateApiKeyDto {
+    name: string;
+    scopes?: string[];
+    expiresAt?: string;
+    rateLimitPerMinute?: number;
+}

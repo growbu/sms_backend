@@ -1,0 +1,52 @@
+import { Model } from 'mongoose';
+import { DeviceDocument } from './schemas/device.schema.js';
+import { RegisterDeviceDto, UpdateFcmTokenDto, HeartbeatDto, UpdateDeviceStatusDto } from './dto/index.js';
+export declare class DevicesService {
+    private readonly deviceModel;
+    constructor(deviceModel: Model<DeviceDocument>);
+    registerDevice(userId: string, dto: RegisterDeviceDto): Promise<DeviceDocument>;
+    updateFcmToken(userId: string, deviceObjectId: string, dto: UpdateFcmTokenDto): Promise<DeviceDocument>;
+    heartbeat(userId: string, deviceObjectId: string, dto: HeartbeatDto): Promise<DeviceDocument>;
+    updateDeviceStatus(userId: string, deviceObjectId: string, dto: UpdateDeviceStatusDto): Promise<DeviceDocument>;
+    listDevices(userId: string): Promise<DeviceDocument[]>;
+    getDevice(userId: string, deviceObjectId: string): Promise<DeviceDocument>;
+    deleteDevice(userId: string, deviceObjectId: string): Promise<void>;
+    findEligibleDevice(userId: string): Promise<DeviceDocument | null>;
+    private findDeviceAndVerifyOwnership;
+    serializeDevice(device: DeviceDocument): {
+        id: string;
+        deviceId: unknown;
+        deviceName: unknown;
+        platform: unknown;
+        brand: unknown;
+        model: unknown;
+        androidVersion: unknown;
+        appVersion: unknown;
+        fcmToken: unknown;
+        simLabel: unknown;
+        simSlot: unknown;
+        phoneNumber: unknown;
+        isActive: unknown;
+        status: unknown;
+        batteryLevel: unknown;
+        isCharging: unknown;
+        lastSeenAt: unknown;
+        createdAt: unknown;
+        updatedAt: unknown;
+    };
+    serializeDeviceSummary(device: DeviceDocument): {
+        id: string;
+        deviceId: unknown;
+        deviceName: unknown;
+        platform: unknown;
+        brand: unknown;
+        model: unknown;
+        isActive: unknown;
+        status: unknown;
+        batteryLevel: unknown;
+        isCharging: unknown;
+        simLabel: unknown;
+        simSlot: unknown;
+        lastSeenAt: unknown;
+    };
+}

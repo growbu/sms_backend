@@ -1,0 +1,111 @@
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthService } from './auth.service.js';
+import { SignupDto, LoginDto, GoogleAuthDto, RefreshTokenDto, UpdateProfileDto } from './dto/index.js';
+import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import type { UserDocument } from '../user/schemas/user.schema.js';
+import type { Request } from 'express';
+
+interface AuthenticatedRequest extends Request {
+  user: UserDocument;
+}
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('signup')
+  async signup(@Body() dto: SignupDto) {
+    const result = await this.authService.signup(dto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Account created successfully',
+      data: result,
+    };
+  }
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() dto: LoginDto) {
+    const result = await this.authService.login(dto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Logged in successfully',
+      data: result,
+    };
+  }
+
+  @Post('google')
+  @HttpCode(HttpStatus.OK)
+  async googleAuth(@Body() dto: GoogleAuthDto) {
+    const result = await this.authService.googleAuth(dto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Google authentication successful',
+      data: result,
+    };
+  }
+
+  @Post('refresh')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async refreshTokens(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: RefreshTokenDto,
+  ) {
+    const userId = (req.user._id as { toString(): string }).toString();
+    const tokens = await this.authService.refreshTokens(userId, dto.refreshToken);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Tokens refreshed successfully',
+      data: tokens,
+    };
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async logout(@Req() req: AuthenticatedRequest) {
+    const userId = (req.user._id as { toString(): string }).toString();
+    await this.authService.logout(userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Logged out successfully',
+    };
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getMe(@Req() req: AuthenticatedRequest) {
+    const profile = this.authService.getProfile(req.user);
+    return {
+      statusCode: HttpStatus.OK,
+      data: profile,
+    };
+  }
+
+  @Patch('profile')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async updateProfile(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    const userId = (req.user._id as { toString(): string }).toString();
+    const profile = await this.authService.updateProfile(userId, dto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Profile updated successfully',
+      data: profile,
+    };
+  }
+}
