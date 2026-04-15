@@ -41,6 +41,7 @@ export class MessagesService {
     apiKeyId: string | null,
     dto: SendMessageDto,
     source: MessageSource = MessageSource.API,
+    campaignId: string | null = null,
   ): Promise<{ message: MessageDocument; device: DeviceDocument }> {
     // 1. Select device
     const device = await this.selectDevice(userId, dto.deviceId ?? null);
@@ -51,6 +52,7 @@ export class MessagesService {
     const messageDoc = await this.messageModel.create({
       userId: new Types.ObjectId(userId),
       apiKeyId: apiKeyId ? new Types.ObjectId(apiKeyId) : null,
+      campaignId: campaignId ? new Types.ObjectId(campaignId) : null,
       deviceId: device._id,
       recipient: dto.recipient.trim(),
       message: dto.message,
@@ -290,6 +292,9 @@ export class MessagesService {
       id: (message._id as { toString(): string }).toString(),
       deviceId: doc.deviceId
         ? (doc.deviceId as { toString(): string }).toString()
+        : null,
+      campaignId: doc.campaignId
+        ? (doc.campaignId as { toString(): string }).toString()
         : null,
       recipient: doc.recipient,
       message: doc.message,

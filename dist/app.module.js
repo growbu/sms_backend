@@ -14,6 +14,8 @@ const auth_module_js_1 = require("./auth/auth.module.js");
 const devices_module_js_1 = require("./devices/devices.module.js");
 const api_keys_module_js_1 = require("./api-keys/api-keys.module.js");
 const messages_module_js_1 = require("./messages/messages.module.js");
+const templates_module_js_1 = require("./templates/templates.module.js");
+const campaigns_module_js_1 = require("./campaigns/campaigns.module.js");
 const app_controller_js_1 = require("./app.controller.js");
 const app_service_js_1 = require("./app.service.js");
 let AppModule = class AppModule {
@@ -37,6 +39,8 @@ exports.AppModule = AppModule = __decorate([
             devices_module_js_1.DevicesModule,
             api_keys_module_js_1.ApiKeysModule,
             messages_module_js_1.MessagesModule,
+            templates_module_js_1.TemplatesModule,
+            campaigns_module_js_1.CampaignsModule,
         ],
         controllers: [app_controller_js_1.AppController],
         providers: [app_service_js_1.AppService],

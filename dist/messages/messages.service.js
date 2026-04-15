@@ -30,12 +30,13 @@ let MessagesService = MessagesService_1 = class MessagesService {
         this.devicesService = devicesService;
         this.fcmService = fcmService;
     }
-    async sendMessage(userId, apiKeyId, dto, source = message_schema_js_1.MessageSource.API) {
+    async sendMessage(userId, apiKeyId, dto, source = message_schema_js_1.MessageSource.API, campaignId = null) {
         const device = await this.selectDevice(userId, dto.deviceId ?? null);
         const now = new Date();
         const messageDoc = await this.messageModel.create({
             userId: new mongoose_2.Types.ObjectId(userId),
             apiKeyId: apiKeyId ? new mongoose_2.Types.ObjectId(apiKeyId) : null,
+            campaignId: campaignId ? new mongoose_2.Types.ObjectId(campaignId) : null,
             deviceId: device._id,
             recipient: dto.recipient.trim(),
             message: dto.message,
@@ -194,6 +195,9 @@ let MessagesService = MessagesService_1 = class MessagesService {
             id: message._id.toString(),
             deviceId: doc.deviceId
                 ? doc.deviceId.toString()
+                : null,
+            campaignId: doc.campaignId
+                ? doc.campaignId.toString()
                 : null,
             recipient: doc.recipient,
             message: doc.message,

@@ -30,6 +30,7 @@ export enum MessageSource {
   DASHBOARD = 'dashboard',
   MANUAL = 'manual',
   SYSTEM = 'system',
+  CAMPAIGN = 'campaign',
 }
 
 @Schema({ timestamps: true })
@@ -39,6 +40,9 @@ export class Message {
 
   @Prop({ type: Types.ObjectId, ref: 'ApiKey', default: null })
   apiKeyId!: Types.ObjectId | null;
+
+  @Prop({ type: Types.ObjectId, ref: 'Campaign', default: null, index: true })
+  campaignId!: Types.ObjectId | null;
 
   @Prop({ type: Types.ObjectId, ref: 'Device', default: null, index: true })
   deviceId!: Types.ObjectId | null;
@@ -103,3 +107,4 @@ MessageSchema.index({ userId: 1, status: 1, createdAt: -1 });
 MessageSchema.index({ userId: 1, recipient: 1, createdAt: -1 });
 MessageSchema.index({ userId: 1, source: 1, createdAt: -1 });
 MessageSchema.index({ userId: 1, deviceId: 1, createdAt: -1 });
+MessageSchema.index({ campaignId: 1, status: 1 });

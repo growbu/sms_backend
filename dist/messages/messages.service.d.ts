@@ -10,7 +10,7 @@ export declare class MessagesService {
     private readonly fcmService;
     private readonly logger;
     constructor(messageModel: Model<MessageDocument>, devicesService: DevicesService, fcmService: FcmService);
-    sendMessage(userId: string, apiKeyId: string | null, dto: SendMessageDto, source?: MessageSource): Promise<{
+    sendMessage(userId: string, apiKeyId: string | null, dto: SendMessageDto, source?: MessageSource, campaignId?: string | null): Promise<{
         message: MessageDocument;
         device: DeviceDocument;
     }>;
@@ -30,6 +30,7 @@ export declare class MessagesService {
     serializeMessage(message: MessageDocument): {
         id: string;
         deviceId: string | null;
+        campaignId: string | null;
         recipient: unknown;
         message: unknown;
         segmentsCount: unknown;

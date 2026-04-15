@@ -35,10 +35,12 @@ var MessageSource;
     MessageSource["DASHBOARD"] = "dashboard";
     MessageSource["MANUAL"] = "manual";
     MessageSource["SYSTEM"] = "system";
+    MessageSource["CAMPAIGN"] = "campaign";
 })(MessageSource || (exports.MessageSource = MessageSource = {}));
 let Message = class Message {
     userId;
     apiKeyId;
+    campaignId;
     deviceId;
     recipient;
     message;
@@ -64,6 +66,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'ApiKey', default: null }),
     __metadata("design:type", Object)
 ], Message.prototype, "apiKeyId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Campaign', default: null, index: true }),
+    __metadata("design:type", Object)
+], Message.prototype, "campaignId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Device', default: null, index: true }),
     __metadata("design:type", Object)
@@ -142,4 +148,5 @@ exports.MessageSchema.index({ userId: 1, status: 1, createdAt: -1 });
 exports.MessageSchema.index({ userId: 1, recipient: 1, createdAt: -1 });
 exports.MessageSchema.index({ userId: 1, source: 1, createdAt: -1 });
 exports.MessageSchema.index({ userId: 1, deviceId: 1, createdAt: -1 });
+exports.MessageSchema.index({ campaignId: 1, status: 1 });
 //# sourceMappingURL=message.schema.js.map

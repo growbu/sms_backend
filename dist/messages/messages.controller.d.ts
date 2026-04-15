@@ -22,6 +22,7 @@ export declare class MessagesController {
             };
             id: string;
             deviceId: string | null;
+            campaignId: string | null;
             recipient: unknown;
             message: unknown;
             segmentsCount: unknown;
@@ -51,6 +52,7 @@ export declare class MessagesController {
             };
             id: string;
             deviceId: string | null;
+            campaignId: string | null;
             recipient: unknown;
             message: unknown;
             segmentsCount: unknown;
@@ -75,6 +77,7 @@ export declare class MessagesController {
             messages: {
                 id: string;
                 deviceId: string | null;
+                campaignId: string | null;
                 recipient: unknown;
                 message: unknown;
                 segmentsCount: unknown;
@@ -105,6 +108,7 @@ export declare class MessagesController {
         data: {
             id: string;
             deviceId: string | null;
+            campaignId: string | null;
             recipient: unknown;
             message: unknown;
             segmentsCount: unknown;
@@ -129,6 +133,7 @@ export declare class MessagesController {
         data: {
             id: string;
             deviceId: string | null;
+            campaignId: string | null;
             recipient: unknown;
             message: unknown;
             segmentsCount: unknown;

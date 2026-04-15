@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module.js';
 import { DevicesModule } from './devices/devices.module.js';
 import { ApiKeysModule } from './api-keys/api-keys.module.js';
 import { MessagesModule } from './messages/messages.module.js';
+import { TemplatesModule } from './templates/templates.module.js';
+import { CampaignsModule } from './campaigns/campaigns.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 
@@ -25,6 +27,8 @@ import { AppService } from './app.service.js';
     DevicesModule,
     ApiKeysModule,
     MessagesModule,
+    TemplatesModule,
+    CampaignsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

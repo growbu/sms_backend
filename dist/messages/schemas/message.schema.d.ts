@@ -13,11 +13,13 @@ export declare enum MessageSource {
     API = "api",
     DASHBOARD = "dashboard",
     MANUAL = "manual",
-    SYSTEM = "system"
+    SYSTEM = "system",
+    CAMPAIGN = "campaign"
 }
 export declare class Message {
     userId: Types.ObjectId;
     apiKeyId: Types.ObjectId | null;
+    campaignId: Types.ObjectId | null;
     deviceId: Types.ObjectId | null;
     recipient: string;
     message: string;
@@ -53,6 +55,15 @@ export declare const MessageSchema: import("mongoose").Schema<Message, import("m
         id: string;
     }> | undefined;
     apiKeyId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId | null, Message, import("mongoose").Document<unknown, {}, Message, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Message & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & {
+        id: string;
+    }> | undefined;
+    campaignId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId | null, Message, import("mongoose").Document<unknown, {}, Message, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Message & {
         _id: Types.ObjectId;
