@@ -11,6 +11,15 @@ export interface AuthResponse {
     user: UserProfile;
     tokens: AuthTokens;
 }
+export interface SubscriptionInfo {
+    status: string;
+    trialDaysRemaining: number;
+    trialSmsRemaining: number;
+    trialSmsUsed: number;
+    trialSmsLimit: number;
+    trialEndsAt: Date | null;
+    subscriptionExpiresAt: Date | null;
+}
 export interface UserProfile {
     id: string;
     fullName: string;
@@ -21,4 +30,5 @@ export interface UserProfile {
     isEmailVerified: boolean;
     createdAt: Date;
     updatedAt: Date;
+    subscription: SubscriptionInfo;
 }

@@ -50,19 +50,22 @@ const bcrypt = __importStar(require("bcrypt"));
 const google_auth_library_1 = require("google-auth-library");
 const user_service_js_1 = require("../user/user.service.js");
 const user_schema_js_1 = require("../user/schemas/user.schema.js");
+const subscription_service_js_1 = require("../subscription/subscription.service.js");
 let AuthService = class AuthService {
     userService;
     jwtService;
     configService;
+    subscriptionService;
     googleClient;
     accessSecret;
     refreshSecret;
     accessExpiresIn;
     refreshExpiresIn;
-    constructor(userService, jwtService, configService) {
+    constructor(userService, jwtService, configService, subscriptionService) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.configService = configService;
+        this.subscriptionService = subscriptionService;
         const googleClientId = this.configService.get('GOOGLE_CLIENT_ID');
         this.googleClient = new google_auth_library_1.OAuth2Client(googleClientId);
         this.accessSecret = this.configService.getOrThrow('JWT_ACCESS_SECRET');
@@ -218,6 +221,7 @@ let AuthService = class AuthService {
     }
     buildUserProfile(user) {
         const doc = user.toObject();
+        const subscriptionInfo = this.subscriptionService.buildStatusResponse(user);
         return {
             id: user._id.toString(),
             fullName: doc.fullName,
@@ -228,6 +232,7 @@ let AuthService = class AuthService {
             isEmailVerified: doc.isEmailVerified,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt,
+            subscription: subscriptionInfo,
         };
     }
     parseDuration(value) {
@@ -250,6 +255,7 @@ exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [user_service_js_1.UserService,
         jwt_1.JwtService,
-        config_1.ConfigService])
+        config_1.ConfigService,
+        subscription_service_js_1.SubscriptionService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { OAuth2Client, type TokenPayload } from 'google-auth-library';
 import { UserService } from '../user/user.service.js';
 import { UserDocument, AuthProvider } from '../user/schemas/user.schema.js';
+import { SubscriptionService } from '../subscription/subscription.service.js';
 import { SignupDto, LoginDto, GoogleAuthDto } from './dto/index.js';
 import type {
   AuthResponse,
@@ -24,21 +25,22 @@ export class AuthService {
   private readonly googleClient: OAuth2Client;
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
-  private readonly accessExpiresIn: number;
+  private readonly accessExpiresIn: number | null;
   private readonly refreshExpiresIn: number;
 
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly subscriptionService: SubscriptionService,
   ) {
     const googleClientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
     this.googleClient = new OAuth2Client(googleClientId);
 
     this.accessSecret = this.configService.getOrThrow<string>('JWT_ACCESS_SECRET');
     this.refreshSecret = this.configService.getOrThrow<string>('JWT_REFRESH_SECRET');
-    this.accessExpiresIn = this.parseDuration(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '15m'));
-    this.refreshExpiresIn = this.parseDuration(this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'));
+    this.accessExpiresIn = this.parseDuration(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '0'));
+    this.refreshExpiresIn = this.parseDuration(this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d')) ?? 604800;
   }
 
   // ─── Email/Password Signup ───────────────────────────────────────────
@@ -223,7 +225,7 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.accessSecret,
-        expiresIn: this.accessExpiresIn,
+        ...(this.accessExpiresIn !== null ? { expiresIn: this.accessExpiresIn } : {}),
       }),
       this.jwtService.signAsync(jwtPayload, {
         secret: this.refreshSecret,
@@ -258,6 +260,7 @@ export class AuthService {
 
   private buildUserProfile(user: UserDocument): UserProfile {
     const doc = user.toObject() as unknown as Record<string, unknown>;
+    const subscriptionInfo = this.subscriptionService.buildStatusResponse(user);
     return {
       id: (user._id as { toString(): string }).toString(),
       fullName: doc.fullName as string,
@@ -268,10 +271,14 @@ export class AuthService {
       isEmailVerified: doc.isEmailVerified as boolean,
       createdAt: doc.createdAt as Date,
       updatedAt: doc.updatedAt as Date,
+      subscription: subscriptionInfo,
     };
   }
 
-  private parseDuration(value: string): number {
+  private parseDuration(value: string): number | null {
+    if (value === '0' || value === 'never') {
+      return null; // null means no expiry — the exp claim is omitted from the JWT
+    }
     const units: Record<string, number> = {
       s: 1,
       m: 60,
@@ -281,7 +288,7 @@ export class AuthService {
     };
     const match = value.match(/^(\d+)([smhdw])$/);
     if (!match) {
-      return 900; // fallback: 15 minutes
+      return null; // unrecognised format → no expiry
     }
     return parseInt(match[1]!, 10) * (units[match[2]!] ?? 1);
   }

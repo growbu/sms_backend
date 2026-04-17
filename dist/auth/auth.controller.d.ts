@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { SignupDto, LoginDto, GoogleAuthDto, RefreshTokenDto, UpdateProfileDto } from './dto/index.js';
+import { SubscriptionService } from '../subscription/subscription.service.js';
 import type { UserDocument } from '../user/schemas/user.schema.js';
 import type { Request } from 'express';
 interface AuthenticatedRequest extends Request {
@@ -8,7 +9,8 @@ interface AuthenticatedRequest extends Request {
 }
 export declare class AuthController {
     private readonly authService;
-    constructor(authService: AuthService);
+    private readonly subscriptionService;
+    constructor(authService: AuthService, subscriptionService: SubscriptionService);
     signup(dto: SignupDto): Promise<{
         statusCode: HttpStatus;
         message: string;
@@ -37,6 +39,10 @@ export declare class AuthController {
         statusCode: HttpStatus;
         data: import("./interfaces/auth.interfaces.js").UserProfile;
     };
+    getSubscription(req: AuthenticatedRequest): Promise<{
+        statusCode: HttpStatus;
+        data: import("../subscription/subscription.service.js").SubscriptionStatusResponse;
+    }>;
     updateProfile(req: AuthenticatedRequest, dto: UpdateProfileDto): Promise<{
         statusCode: HttpStatus;
         message: string;

@@ -15,6 +15,7 @@ const messages_service_js_1 = require("./messages.service.js");
 const fcm_service_js_1 = require("./services/fcm.service.js");
 const devices_module_js_1 = require("../devices/devices.module.js");
 const api_keys_module_js_1 = require("../api-keys/api-keys.module.js");
+const subscription_module_js_1 = require("../subscription/subscription.module.js");
 let MessagesModule = class MessagesModule {
 };
 exports.MessagesModule = MessagesModule;
@@ -24,6 +25,7 @@ exports.MessagesModule = MessagesModule = __decorate([
             mongoose_1.MongooseModule.forFeature([{ name: message_schema_js_1.Message.name, schema: message_schema_js_1.MessageSchema }]),
             devices_module_js_1.DevicesModule,
             api_keys_module_js_1.ApiKeysModule,
+            subscription_module_js_1.SubscriptionModule,
         ],
         controllers: [messages_controller_js_1.MessagesController],
         providers: [messages_service_js_1.MessagesService, fcm_service_js_1.FcmService],

@@ -56,6 +56,16 @@ let UserService = class UserService {
         }, { new: true })
             .exec();
     }
+    async incrementTrialSmsUsed(userId) {
+        return this.userModel
+            .findByIdAndUpdate(userId, { $inc: { trialSmsUsed: 1 } }, { new: true })
+            .exec();
+    }
+    async updateSubscriptionStatus(userId, status, fields) {
+        return this.userModel
+            .findByIdAndUpdate(userId, { $set: { subscriptionStatus: status, ...fields } }, { new: true })
+            .exec();
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([

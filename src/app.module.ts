@@ -7,6 +7,7 @@ import { ApiKeysModule } from './api-keys/api-keys.module.js';
 import { MessagesModule } from './messages/messages.module.js';
 import { TemplatesModule } from './templates/templates.module.js';
 import { CampaignsModule } from './campaigns/campaigns.module.js';
+import { SubscriptionModule } from './subscription/subscription.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 
@@ -29,8 +30,10 @@ import { AppService } from './app.service.js';
     MessagesModule,
     TemplatesModule,
     CampaignsModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+

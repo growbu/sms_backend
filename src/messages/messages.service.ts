@@ -21,6 +21,7 @@ import {
 } from './dto/index.js';
 import { DevicesService } from '../devices/devices.service.js';
 import { FcmService } from './services/fcm.service.js';
+import { SubscriptionService } from '../subscription/subscription.service.js';
 import type { DeviceDocument } from '../devices/schemas/device.schema.js';
 
 @Injectable()
@@ -32,6 +33,7 @@ export class MessagesService {
     private readonly messageModel: Model<MessageDocument>,
     private readonly devicesService: DevicesService,
     private readonly fcmService: FcmService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   // ─── Send SMS (API key flow) ─────────────────────────────────────────
@@ -43,6 +45,9 @@ export class MessagesService {
     source: MessageSource = MessageSource.API,
     campaignId: string | null = null,
   ): Promise<{ message: MessageDocument; device: DeviceDocument }> {
+    // 0. Subscription gate — blocks trial-expired and over-limit users
+    await this.subscriptionService.assertCanSendSms(userId);
+
     // 1. Select device
     const device = await this.selectDevice(userId, dto.deviceId ?? null);
 
@@ -107,6 +112,9 @@ export class MessagesService {
     const updatedMessage = await this.messageModel
       .findById(messageId)
       .exec();
+
+    // Record SMS usage (increments trial counter for trial users)
+    await this.subscriptionService.recordSmsSent(userId);
 
     this.logger.log(
       `Message ${messageId} dispatched to device ${deviceObjectId} via FCM`,

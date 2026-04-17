@@ -12,6 +12,7 @@ import {
 import { AuthService } from './auth.service.js';
 import { SignupDto, LoginDto, GoogleAuthDto, RefreshTokenDto, UpdateProfileDto } from './dto/index.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { SubscriptionService } from '../subscription/subscription.service.js';
 import type { UserDocument } from '../user/schemas/user.schema.js';
 import type { Request } from 'express';
 
@@ -21,7 +22,10 @@ interface AuthenticatedRequest extends Request {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly subscriptionService: SubscriptionService,
+  ) {}
 
   @Post('signup')
   async signup(@Body() dto: SignupDto) {
@@ -90,6 +94,18 @@ export class AuthController {
     return {
       statusCode: HttpStatus.OK,
       data: profile,
+    };
+  }
+
+  @Get('subscription')
+  @UseGuards(JwtAuthGuard)
+  async getSubscription(@Req() req: AuthenticatedRequest) {
+    const userId = (req.user._id as { toString(): string }).toString();
+    const subscription =
+      await this.subscriptionService.getSubscriptionStatus(userId);
+    return {
+      statusCode: HttpStatus.OK,
+      data: subscription,
     };
   }
 

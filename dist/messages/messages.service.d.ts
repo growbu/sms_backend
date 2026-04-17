@@ -3,13 +3,15 @@ import { MessageDocument, MessageSource } from './schemas/message.schema.js';
 import { SendMessageDto, UpdateMessageStatusDto, QueryMessagesDto } from './dto/index.js';
 import { DevicesService } from '../devices/devices.service.js';
 import { FcmService } from './services/fcm.service.js';
+import { SubscriptionService } from '../subscription/subscription.service.js';
 import type { DeviceDocument } from '../devices/schemas/device.schema.js';
 export declare class MessagesService {
     private readonly messageModel;
     private readonly devicesService;
     private readonly fcmService;
+    private readonly subscriptionService;
     private readonly logger;
-    constructor(messageModel: Model<MessageDocument>, devicesService: DevicesService, fcmService: FcmService);
+    constructor(messageModel: Model<MessageDocument>, devicesService: DevicesService, fcmService: FcmService, subscriptionService: SubscriptionService);
     sendMessage(userId: string, apiKeyId: string | null, dto: SendMessageDto, source?: MessageSource, campaignId?: string | null): Promise<{
         message: MessageDocument;
         device: DeviceDocument;

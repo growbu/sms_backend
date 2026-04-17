@@ -20,17 +20,21 @@ const mongoose_2 = require("mongoose");
 const message_schema_js_1 = require("./schemas/message.schema.js");
 const devices_service_js_1 = require("../devices/devices.service.js");
 const fcm_service_js_1 = require("./services/fcm.service.js");
+const subscription_service_js_1 = require("../subscription/subscription.service.js");
 let MessagesService = MessagesService_1 = class MessagesService {
     messageModel;
     devicesService;
     fcmService;
+    subscriptionService;
     logger = new common_1.Logger(MessagesService_1.name);
-    constructor(messageModel, devicesService, fcmService) {
+    constructor(messageModel, devicesService, fcmService, subscriptionService) {
         this.messageModel = messageModel;
         this.devicesService = devicesService;
         this.fcmService = fcmService;
+        this.subscriptionService = subscriptionService;
     }
     async sendMessage(userId, apiKeyId, dto, source = message_schema_js_1.MessageSource.API, campaignId = null) {
+        await this.subscriptionService.assertCanSendSms(userId);
         const device = await this.selectDevice(userId, dto.deviceId ?? null);
         const now = new Date();
         const messageDoc = await this.messageModel.create({
@@ -74,6 +78,7 @@ let MessagesService = MessagesService_1 = class MessagesService {
         const updatedMessage = await this.messageModel
             .findById(messageId)
             .exec();
+        await this.subscriptionService.recordSmsSent(userId);
         this.logger.log(`Message ${messageId} dispatched to device ${deviceObjectId} via FCM`);
         return { message: updatedMessage, device };
     }
@@ -247,6 +252,7 @@ exports.MessagesService = MessagesService = MessagesService_1 = __decorate([
     __param(0, (0, mongoose_1.InjectModel)(message_schema_js_1.Message.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         devices_service_js_1.DevicesService,
-        fcm_service_js_1.FcmService])
+        fcm_service_js_1.FcmService,
+        subscription_service_js_1.SubscriptionService])
 ], MessagesService);
 //# sourceMappingURL=messages.service.js.map

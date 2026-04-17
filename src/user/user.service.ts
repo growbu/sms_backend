@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema.js';
+import {
+  User,
+  UserDocument,
+  SubscriptionStatus,
+} from './schemas/user.schema.js';
 
 @Injectable()
 export class UserService {
@@ -59,6 +63,40 @@ export class UserService {
           avatar,
           isEmailVerified: true,
         },
+        { new: true },
+      )
+      .exec();
+  }
+
+  // ─── Subscription & Trial ──────────────────────────────────────────
+
+  async incrementTrialSmsUsed(userId: string): Promise<UserDocument | null> {
+    return this.userModel
+      .findByIdAndUpdate(
+        userId,
+        { $inc: { trialSmsUsed: 1 } },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async updateSubscriptionStatus(
+    userId: string,
+    status: SubscriptionStatus,
+    fields?: Partial<
+      Pick<
+        User,
+        | 'stripeCustomerId'
+        | 'stripeSubscriptionId'
+        | 'subscriptionActivatedAt'
+        | 'subscriptionExpiresAt'
+      >
+    >,
+  ): Promise<UserDocument | null> {
+    return this.userModel
+      .findByIdAndUpdate(
+        userId,
+        { $set: { subscriptionStatus: status, ...fields } },
         { new: true },
       )
       .exec();

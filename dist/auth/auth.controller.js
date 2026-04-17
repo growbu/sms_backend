@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const auth_service_js_1 = require("./auth.service.js");
 const index_js_1 = require("./dto/index.js");
 const jwt_auth_guard_js_1 = require("./guards/jwt-auth.guard.js");
+const subscription_service_js_1 = require("../subscription/subscription.service.js");
 let AuthController = class AuthController {
     authService;
-    constructor(authService) {
+    subscriptionService;
+    constructor(authService, subscriptionService) {
         this.authService = authService;
+        this.subscriptionService = subscriptionService;
     }
     async signup(dto) {
         const result = await this.authService.signup(dto);
@@ -68,6 +71,14 @@ let AuthController = class AuthController {
         return {
             statusCode: common_1.HttpStatus.OK,
             data: profile,
+        };
+    }
+    async getSubscription(req) {
+        const userId = req.user._id.toString();
+        const subscription = await this.subscriptionService.getSubscriptionStatus(userId);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            data: subscription,
         };
     }
     async updateProfile(req, dto) {
@@ -132,6 +143,14 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getMe", null);
 __decorate([
+    (0, common_1.Get)('subscription'),
+    (0, common_1.UseGuards)(jwt_auth_guard_js_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getSubscription", null);
+__decorate([
     (0, common_1.Patch)('profile'),
     (0, common_1.UseGuards)(jwt_auth_guard_js_1.JwtAuthGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -143,6 +162,7 @@ __decorate([
 ], AuthController.prototype, "updateProfile", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_js_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_js_1.AuthService,
+        subscription_service_js_1.SubscriptionService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

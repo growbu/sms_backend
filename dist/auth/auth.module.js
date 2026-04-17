@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const user_module_js_1 = require("../user/user.module.js");
+const subscription_module_js_1 = require("../subscription/subscription.module.js");
 const auth_controller_js_1 = require("./auth.controller.js");
 const auth_service_js_1 = require("./auth.service.js");
 const jwt_strategy_js_1 = require("./strategies/jwt.strategy.js");
@@ -21,6 +22,7 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             user_module_js_1.UserModule,
+            subscription_module_js_1.SubscriptionModule,
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
             jwt_1.JwtModule.register({}),
         ],

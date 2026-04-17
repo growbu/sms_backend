@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserSchema = exports.User = exports.UserRole = exports.AuthProvider = void 0;
+exports.UserSchema = exports.User = exports.SubscriptionStatus = exports.UserRole = exports.AuthProvider = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 var AuthProvider;
 (function (AuthProvider) {
@@ -21,6 +21,14 @@ var UserRole;
     UserRole["USER"] = "user";
     UserRole["ADMIN"] = "admin";
 })(UserRole || (exports.UserRole = UserRole = {}));
+var SubscriptionStatus;
+(function (SubscriptionStatus) {
+    SubscriptionStatus["FREE_TRIAL"] = "free_trial";
+    SubscriptionStatus["ACTIVE"] = "active";
+    SubscriptionStatus["PAST_DUE"] = "past_due";
+    SubscriptionStatus["CANCELLED"] = "cancelled";
+    SubscriptionStatus["EXPIRED"] = "expired";
+})(SubscriptionStatus || (exports.SubscriptionStatus = SubscriptionStatus = {}));
 let User = class User {
     fullName;
     email;
@@ -31,6 +39,15 @@ let User = class User {
     role;
     isEmailVerified;
     refreshTokenHash;
+    subscriptionStatus;
+    trialStartedAt;
+    trialEndsAt;
+    trialSmsUsed;
+    trialSmsLimit;
+    stripeCustomerId;
+    stripeSubscriptionId;
+    subscriptionActivatedAt;
+    subscriptionExpiresAt;
 };
 exports.User = User;
 __decorate([
@@ -75,6 +92,49 @@ __decorate([
     (0, mongoose_1.Prop)({ type: String, default: null }),
     __metadata("design:type", Object)
 ], User.prototype, "refreshTokenHash", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
+        enum: SubscriptionStatus,
+        default: SubscriptionStatus.FREE_TRIAL,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "subscriptionStatus", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Date, default: () => new Date() }),
+    __metadata("design:type", Date)
+], User.prototype, "trialStartedAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: Date,
+        default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    }),
+    __metadata("design:type", Date)
+], User.prototype, "trialEndsAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Number, default: 0 }),
+    __metadata("design:type", Number)
+], User.prototype, "trialSmsUsed", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Number, default: 50 }),
+    __metadata("design:type", Number)
+], User.prototype, "trialSmsLimit", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, default: null }),
+    __metadata("design:type", Object)
+], User.prototype, "stripeCustomerId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, default: null }),
+    __metadata("design:type", Object)
+], User.prototype, "stripeSubscriptionId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Date, default: null }),
+    __metadata("design:type", Object)
+], User.prototype, "subscriptionActivatedAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Date, default: null }),
+    __metadata("design:type", Object)
+], User.prototype, "subscriptionExpiresAt", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);
