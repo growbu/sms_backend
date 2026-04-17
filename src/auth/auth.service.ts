@@ -39,8 +39,8 @@ export class AuthService {
 
     this.accessSecret = this.configService.getOrThrow<string>('JWT_ACCESS_SECRET');
     this.refreshSecret = this.configService.getOrThrow<string>('JWT_REFRESH_SECRET');
-    this.accessExpiresIn = this.parseDuration(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '0'));
-    this.refreshExpiresIn = this.parseDuration(this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d')) ?? 604800;
+    this.accessExpiresIn = this.parseDuration(this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '365d'));
+    this.refreshExpiresIn = this.parseDuration(this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '365d')) ?? 31536000;
   }
 
   // ─── Email/Password Signup ───────────────────────────────────────────
