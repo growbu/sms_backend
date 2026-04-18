@@ -49,9 +49,8 @@ let AuthController = class AuthController {
             data: result,
         };
     }
-    async refreshTokens(req, dto) {
-        const userId = req.user._id.toString();
-        const tokens = await this.authService.refreshTokens(userId, dto.refreshToken);
+    async refreshTokens(dto) {
+        const tokens = await this.authService.refreshTokens(dto.refreshToken);
         return {
             statusCode: common_1.HttpStatus.OK,
             message: 'Tokens refreshed successfully',
@@ -117,12 +116,10 @@ __decorate([
 ], AuthController.prototype, "googleAuth", null);
 __decorate([
     (0, common_1.Post)('refresh'),
-    (0, common_1.UseGuards)(jwt_auth_guard_js_1.JwtAuthGuard),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Body)()),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, index_js_1.RefreshTokenDto]),
+    __metadata("design:paramtypes", [index_js_1.RefreshTokenDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "refreshTokens", null);
 __decorate([

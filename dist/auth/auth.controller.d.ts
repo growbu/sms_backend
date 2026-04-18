@@ -4,6 +4,7 @@ import { SignupDto, LoginDto, GoogleAuthDto, RefreshTokenDto, UpdateProfileDto }
 import { SubscriptionService } from '../subscription/subscription.service.js';
 import type { UserDocument } from '../user/schemas/user.schema.js';
 import type { Request } from 'express';
+import type { AuthTokens } from './interfaces/auth.interfaces.js';
 interface AuthenticatedRequest extends Request {
     user: UserDocument;
 }
@@ -26,10 +27,10 @@ export declare class AuthController {
         message: string;
         data: import("./interfaces/auth.interfaces.js").AuthResponse;
     }>;
-    refreshTokens(req: AuthenticatedRequest, dto: RefreshTokenDto): Promise<{
+    refreshTokens(dto: RefreshTokenDto): Promise<{
         statusCode: HttpStatus;
         message: string;
-        data: import("./interfaces/auth.interfaces.js").AuthTokens;
+        data: AuthTokens;
     }>;
     logout(req: AuthenticatedRequest): Promise<{
         statusCode: HttpStatus;

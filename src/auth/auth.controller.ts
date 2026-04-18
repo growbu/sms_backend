@@ -15,6 +15,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { SubscriptionService } from '../subscription/subscription.service.js';
 import type { UserDocument } from '../user/schemas/user.schema.js';
 import type { Request } from 'express';
+import type { AuthTokens } from './interfaces/auth.interfaces.js';
 
 interface AuthenticatedRequest extends Request {
   user: UserDocument;
@@ -60,14 +61,16 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async refreshTokens(
-    @Req() req: AuthenticatedRequest,
     @Body() dto: RefreshTokenDto,
   ) {
-    const userId = (req.user._id as { toString(): string }).toString();
-    const tokens = await this.authService.refreshTokens(userId, dto.refreshToken);
+    // No JwtAuthGuard here — the access token may already be expired.
+    // AuthService.refreshTokens verifies the refresh token against
+    // its own secret (JWT_REFRESH_SECRET) and the stored hash.
+    const tokens: AuthTokens = await this.authService.refreshTokens(
+      dto.refreshToken,
+    );
     return {
       statusCode: HttpStatus.OK,
       message: 'Tokens refreshed successfully',

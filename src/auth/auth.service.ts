@@ -147,15 +147,25 @@ export class AuthService {
 
   // ─── Refresh Tokens ──────────────────────────────────────────────────
 
-  async refreshTokens(userId: string, refreshToken: string): Promise<AuthTokens> {
-    const user = await this.userService.findById(userId);
+  async refreshTokens(refreshToken: string): Promise<AuthTokens> {
+    // Verify the refresh token using its own secret — no active access token needed.
+    let payload: JwtPayload;
+    try {
+      payload = await this.jwtService.verifyAsync<JwtPayload>(refreshToken, {
+        secret: this.refreshSecret,
+      });
+    } catch {
+      throw new ForbiddenException('Invalid or expired refresh token — please log in again');
+    }
+
+    const user = await this.userService.findById(payload.sub);
     if (!user || !user.refreshTokenHash) {
       throw new ForbiddenException('Access denied');
     }
 
     const isTokenValid = await bcrypt.compare(refreshToken, user.refreshTokenHash);
     if (!isTokenValid) {
-      // Potential token reuse detected — clear all refresh tokens
+      // Potential token reuse detected — clear stored refresh token
       await this.userService.updateRefreshTokenHash(
         (user._id as { toString(): string }).toString(),
         null,

@@ -19,7 +19,7 @@ export declare class AuthService {
     signup(dto: SignupDto): Promise<AuthResponse>;
     login(dto: LoginDto): Promise<AuthResponse>;
     googleAuth(dto: GoogleAuthDto): Promise<AuthResponse>;
-    refreshTokens(userId: string, refreshToken: string): Promise<AuthTokens>;
+    refreshTokens(refreshToken: string): Promise<AuthTokens>;
     logout(userId: string): Promise<void>;
     getProfile(user: UserDocument): UserProfile;
     updateProfile(userId: string, updates: {

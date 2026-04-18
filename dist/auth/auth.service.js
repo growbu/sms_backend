@@ -70,8 +70,8 @@ let AuthService = class AuthService {
         this.googleClient = new google_auth_library_1.OAuth2Client(googleClientId);
         this.accessSecret = this.configService.getOrThrow('JWT_ACCESS_SECRET');
         this.refreshSecret = this.configService.getOrThrow('JWT_REFRESH_SECRET');
-        this.accessExpiresIn = this.parseDuration(this.configService.get('JWT_ACCESS_EXPIRES_IN', '15m'));
-        this.refreshExpiresIn = this.parseDuration(this.configService.get('JWT_REFRESH_EXPIRES_IN', '7d'));
+        this.accessExpiresIn = this.parseDuration(this.configService.get('JWT_ACCESS_EXPIRES_IN', '365d'));
+        this.refreshExpiresIn = this.parseDuration(this.configService.get('JWT_REFRESH_EXPIRES_IN', '365d')) ?? 31536000;
     }
     async signup(dto) {
         const existingUser = await this.userService.findByEmail(dto.email);
@@ -142,8 +142,17 @@ let AuthService = class AuthService {
             tokens,
         };
     }
-    async refreshTokens(userId, refreshToken) {
-        const user = await this.userService.findById(userId);
+    async refreshTokens(refreshToken) {
+        let payload;
+        try {
+            payload = await this.jwtService.verifyAsync(refreshToken, {
+                secret: this.refreshSecret,
+            });
+        }
+        catch {
+            throw new common_1.ForbiddenException('Invalid or expired refresh token — please log in again');
+        }
+        const user = await this.userService.findById(payload.sub);
         if (!user || !user.refreshTokenHash) {
             throw new common_1.ForbiddenException('Access denied');
         }
@@ -192,7 +201,7 @@ let AuthService = class AuthService {
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(jwtPayload, {
                 secret: this.accessSecret,
-                expiresIn: this.accessExpiresIn,
+                ...(this.accessExpiresIn !== null ? { expiresIn: this.accessExpiresIn } : {}),
             }),
             this.jwtService.signAsync(jwtPayload, {
                 secret: this.refreshSecret,
@@ -236,6 +245,9 @@ let AuthService = class AuthService {
         };
     }
     parseDuration(value) {
+        if (value === '0' || value === 'never') {
+            return null;
+        }
         const units = {
             s: 1,
             m: 60,
@@ -245,7 +257,7 @@ let AuthService = class AuthService {
         };
         const match = value.match(/^(\d+)([smhdw])$/);
         if (!match) {
-            return 900;
+            return null;
         }
         return parseInt(match[1], 10) * (units[match[2]] ?? 1);
     }
