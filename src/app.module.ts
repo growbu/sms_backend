@@ -9,6 +9,7 @@ import { TemplatesModule } from './templates/templates.module.js';
 import { CampaignsModule } from './campaigns/campaigns.module.js';
 import { ReceivedMessagesModule } from './received-messages/received-messages.module.js';
 import { SubscriptionModule } from './subscription/subscription.module.js';
+import { BillingModule } from './billing/billing.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 
@@ -33,9 +34,11 @@ import { AppService } from './app.service.js';
     CampaignsModule,
     SubscriptionModule,
     ReceivedMessagesModule,
+    BillingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+
 

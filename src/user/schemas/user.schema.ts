@@ -91,6 +91,20 @@ export class User {
 
   @Prop({ type: Date, default: null })
   subscriptionExpiresAt!: Date | null;
+
+  // ─── Billing ───────────────────────────────────────────────────────
+
+  @Prop({ type: String, default: null })
+  stripePriceId!: string | null;
+
+  @Prop({ type: String, default: null })
+  currentPlan!: string | null;
+
+  @Prop({ type: Number, default: 0 })
+  deviceLimit!: number;
+
+  @Prop({ type: Boolean, default: false })
+  cancelAtPeriodEnd!: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

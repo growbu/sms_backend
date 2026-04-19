@@ -48,6 +48,10 @@ let User = class User {
     stripeSubscriptionId;
     subscriptionActivatedAt;
     subscriptionExpiresAt;
+    stripePriceId;
+    currentPlan;
+    deviceLimit;
+    cancelAtPeriodEnd;
 };
 exports.User = User;
 __decorate([
@@ -135,6 +139,22 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Date, default: null }),
     __metadata("design:type", Object)
 ], User.prototype, "subscriptionExpiresAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, default: null }),
+    __metadata("design:type", Object)
+], User.prototype, "stripePriceId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, default: null }),
+    __metadata("design:type", Object)
+], User.prototype, "currentPlan", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Number, default: 0 }),
+    __metadata("design:type", Number)
+], User.prototype, "deviceLimit", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Boolean, default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "cancelAtPeriodEnd", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);

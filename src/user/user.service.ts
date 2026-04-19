@@ -90,6 +90,10 @@ export class UserService {
         | 'stripeSubscriptionId'
         | 'subscriptionActivatedAt'
         | 'subscriptionExpiresAt'
+        | 'stripePriceId'
+        | 'currentPlan'
+        | 'deviceLimit'
+        | 'cancelAtPeriodEnd'
       >
     >,
   ): Promise<UserDocument | null> {
@@ -100,5 +104,11 @@ export class UserService {
         { new: true },
       )
       .exec();
+  }
+
+  async findByStripeCustomerId(
+    stripeCustomerId: string,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findOne({ stripeCustomerId }).exec();
   }
 }

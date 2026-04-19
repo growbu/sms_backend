@@ -15,6 +15,7 @@ const subscription_module_js_1 = require("../subscription/subscription.module.js
 const auth_controller_js_1 = require("./auth.controller.js");
 const auth_service_js_1 = require("./auth.service.js");
 const jwt_strategy_js_1 = require("./strategies/jwt.strategy.js");
+const google_strategy_js_1 = require("./strategies/google.strategy.js");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -27,7 +28,7 @@ exports.AuthModule = AuthModule = __decorate([
             jwt_1.JwtModule.register({}),
         ],
         controllers: [auth_controller_js_1.AuthController],
-        providers: [auth_service_js_1.AuthService, jwt_strategy_js_1.JwtStrategy],
+        providers: [auth_service_js_1.AuthService, jwt_strategy_js_1.JwtStrategy, google_strategy_js_1.GoogleStrategy],
         exports: [auth_service_js_1.AuthService],
     })
 ], AuthModule);

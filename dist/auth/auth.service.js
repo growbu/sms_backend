@@ -142,6 +142,38 @@ let AuthService = class AuthService {
             tokens,
         };
     }
+    async googleOauthLogin(googleUser) {
+        const { googleId, email, fullName, picture } = googleUser;
+        if (!email || !googleId) {
+            throw new common_1.BadRequestException('Google profile does not contain required user info');
+        }
+        let user = await this.userService.findByGoogleId(googleId);
+        if (!user) {
+            const existingUser = await this.userService.findByEmail(email);
+            if (existingUser) {
+                user = await this.userService.linkGoogleAccount(existingUser._id.toString(), googleId, picture ?? null);
+                if (!user) {
+                    throw new common_1.BadRequestException('Failed to link Google account');
+                }
+            }
+            else {
+                user = await this.userService.create({
+                    fullName,
+                    email: email.toLowerCase().trim(),
+                    passwordHash: null,
+                    provider: user_schema_js_1.AuthProvider.GOOGLE,
+                    googleId,
+                    avatar: picture ?? null,
+                    isEmailVerified: true,
+                });
+            }
+        }
+        const tokens = await this.generateAndPersistTokens(user);
+        return {
+            user: this.buildUserProfile(user),
+            tokens,
+        };
+    }
     async refreshTokens(refreshToken) {
         let payload;
         try {

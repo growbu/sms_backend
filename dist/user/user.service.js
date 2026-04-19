@@ -66,6 +66,9 @@ let UserService = class UserService {
             .findByIdAndUpdate(userId, { $set: { subscriptionStatus: status, ...fields } }, { new: true })
             .exec();
     }
+    async findByStripeCustomerId(stripeCustomerId) {
+        return this.userModel.findOne({ stripeCustomerId }).exec();
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([

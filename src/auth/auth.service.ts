@@ -19,6 +19,7 @@ import type {
   JwtPayload,
   UserProfile,
 } from './interfaces/auth.interfaces.js';
+import type { GoogleUser } from './strategies/google.strategy.js';
 
 @Injectable()
 export class AuthService {
@@ -127,6 +128,51 @@ export class AuthService {
         // 3. Create new Google-only user
         user = await this.userService.create({
           fullName: name ?? email.split('@')[0] ?? 'User',
+          email: email.toLowerCase().trim(),
+          passwordHash: null,
+          provider: AuthProvider.GOOGLE,
+          googleId,
+          avatar: picture ?? null,
+          isEmailVerified: true,
+        });
+      }
+    }
+
+    const tokens = await this.generateAndPersistTokens(user);
+
+    return {
+      user: this.buildUserProfile(user),
+      tokens,
+    };
+  }
+
+  // ─── Google OAuth Redirect Flow ──────────────────────────────────────
+
+  async googleOauthLogin(googleUser: GoogleUser): Promise<AuthResponse> {
+    const { googleId, email, fullName, picture } = googleUser;
+
+    if (!email || !googleId) {
+      throw new BadRequestException('Google profile does not contain required user info');
+    }
+
+    let user = await this.userService.findByGoogleId(googleId);
+
+    if (!user) {
+      const existingUser = await this.userService.findByEmail(email);
+
+      if (existingUser) {
+        user = await this.userService.linkGoogleAccount(
+          (existingUser._id as { toString(): string }).toString(),
+          googleId,
+          picture ?? null,
+        );
+
+        if (!user) {
+          throw new BadRequestException('Failed to link Google account');
+        }
+      } else {
+        user = await this.userService.create({
+          fullName,
           email: email.toLowerCase().trim(),
           passwordHash: null,
           provider: AuthProvider.GOOGLE,

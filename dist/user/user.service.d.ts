@@ -11,5 +11,6 @@ export declare class UserService {
     updateProfile(userId: string, updates: Partial<Pick<User, 'fullName' | 'avatar'>>): Promise<UserDocument | null>;
     linkGoogleAccount(userId: string, googleId: string, avatar: string | null): Promise<UserDocument | null>;
     incrementTrialSmsUsed(userId: string): Promise<UserDocument | null>;
-    updateSubscriptionStatus(userId: string, status: SubscriptionStatus, fields?: Partial<Pick<User, 'stripeCustomerId' | 'stripeSubscriptionId' | 'subscriptionActivatedAt' | 'subscriptionExpiresAt'>>): Promise<UserDocument | null>;
+    updateSubscriptionStatus(userId: string, status: SubscriptionStatus, fields?: Partial<Pick<User, 'stripeCustomerId' | 'stripeSubscriptionId' | 'subscriptionActivatedAt' | 'subscriptionExpiresAt' | 'stripePriceId' | 'currentPlan' | 'deviceLimit' | 'cancelAtPeriodEnd'>>): Promise<UserDocument | null>;
+    findByStripeCustomerId(stripeCustomerId: string): Promise<UserDocument | null>;
 }

@@ -7,8 +7,11 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import type { Response } from 'express';
 import { AuthService } from './auth.service.js';
 import { SignupDto, LoginDto, GoogleAuthDto, RefreshTokenDto, UpdateProfileDto } from './dto/index.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
@@ -16,6 +19,7 @@ import { SubscriptionService } from '../subscription/subscription.service.js';
 import type { UserDocument } from '../user/schemas/user.schema.js';
 import type { Request } from 'express';
 import type { AuthTokens } from './interfaces/auth.interfaces.js';
+import type { GoogleUser } from './strategies/google.strategy.js';
 
 interface AuthenticatedRequest extends Request {
   user: UserDocument;
@@ -58,6 +62,35 @@ export class AuthController {
       message: 'Google authentication successful',
       data: result,
     };
+  }
+
+  // ─── Google OAuth Redirect Flow ──────────────────────────────────────
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  googleRedirect(): void {
+    // Passport redirects to Google — this handler body never executes
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleCallback(
+    @Req() req: Request & { user: GoogleUser },
+    @Res() res: Response,
+  ): Promise<void> {
+    const dashboardCallbackUrl = process.env.GOOGLE_DASHBOARD_CALLBACK_URL ?? 'http://localhost:3000/api/google-callback';
+
+    try {
+      const result = await this.authService.googleOauthLogin(req.user);
+      const params = new URLSearchParams({
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+        user: JSON.stringify(result.user),
+      });
+      res.redirect(`${dashboardCallbackUrl}?${params.toString()}`);
+    } catch {
+      res.redirect(`${dashboardCallbackUrl}?error=google_auth_failed`);
+    }
   }
 
   @Post('refresh')

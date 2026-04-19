@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
+const passport_1 = require("@nestjs/passport");
 const auth_service_js_1 = require("./auth.service.js");
 const index_js_1 = require("./dto/index.js");
 const jwt_auth_guard_js_1 = require("./guards/jwt-auth.guard.js");
@@ -48,6 +49,23 @@ let AuthController = class AuthController {
             message: 'Google authentication successful',
             data: result,
         };
+    }
+    googleRedirect() {
+    }
+    async googleCallback(req, res) {
+        const dashboardCallbackUrl = process.env.GOOGLE_DASHBOARD_CALLBACK_URL ?? 'http://localhost:3000/api/google-callback';
+        try {
+            const result = await this.authService.googleOauthLogin(req.user);
+            const params = new URLSearchParams({
+                accessToken: result.tokens.accessToken,
+                refreshToken: result.tokens.refreshToken,
+                user: JSON.stringify(result.user),
+            });
+            res.redirect(`${dashboardCallbackUrl}?${params.toString()}`);
+        }
+        catch {
+            res.redirect(`${dashboardCallbackUrl}?error=google_auth_failed`);
+        }
     }
     async refreshTokens(dto) {
         const tokens = await this.authService.refreshTokens(dto.refreshToken);
@@ -114,6 +132,22 @@ __decorate([
     __metadata("design:paramtypes", [index_js_1.GoogleAuthDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "googleAuth", null);
+__decorate([
+    (0, common_1.Get)('google/redirect'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "googleRedirect", null);
+__decorate([
+    (0, common_1.Get)('google/callback'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleCallback", null);
 __decorate([
     (0, common_1.Post)('refresh'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

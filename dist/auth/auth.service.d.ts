@@ -5,6 +5,7 @@ import { UserDocument } from '../user/schemas/user.schema.js';
 import { SubscriptionService } from '../subscription/subscription.service.js';
 import { SignupDto, LoginDto, GoogleAuthDto } from './dto/index.js';
 import type { AuthResponse, AuthTokens, UserProfile } from './interfaces/auth.interfaces.js';
+import type { GoogleUser } from './strategies/google.strategy.js';
 export declare class AuthService {
     private readonly userService;
     private readonly jwtService;
@@ -19,6 +20,7 @@ export declare class AuthService {
     signup(dto: SignupDto): Promise<AuthResponse>;
     login(dto: LoginDto): Promise<AuthResponse>;
     googleAuth(dto: GoogleAuthDto): Promise<AuthResponse>;
+    googleOauthLogin(googleUser: GoogleUser): Promise<AuthResponse>;
     refreshTokens(refreshToken: string): Promise<AuthTokens>;
     logout(userId: string): Promise<void>;
     getProfile(user: UserDocument): UserProfile;
