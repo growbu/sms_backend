@@ -290,9 +290,9 @@ export class BillingService {
         currentPlan: plan.key,
         deviceLimit: plan.deviceLimit,
         subscriptionActivatedAt: new Date(),
-        subscriptionExpiresAt: new Date(
-          (subscription as unknown as { current_period_end: number }).current_period_end * 1000,
-        ),
+        subscriptionExpiresAt: (subscription as any).current_period_end
+          ? new Date((subscription as any).current_period_end * 1000)
+          : null,
         cancelAtPeriodEnd: false,
       },
     );
@@ -340,9 +340,9 @@ export class BillingService {
       stripePriceId: priceId ?? user.stripePriceId,
       currentPlan: plan?.key ?? user.currentPlan,
       deviceLimit: plan?.deviceLimit ?? user.deviceLimit,
-      subscriptionExpiresAt: new Date(
-        (subscription as unknown as { current_period_end: number }).current_period_end * 1000,
-      ),
+      subscriptionExpiresAt: (subscription as any).current_period_end
+        ? new Date((subscription as any).current_period_end * 1000)
+        : null,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     });
 
@@ -430,9 +430,9 @@ export class BillingService {
         stripePriceId: priceId ?? user.stripePriceId,
         currentPlan: plan?.key ?? user.currentPlan,
         deviceLimit: plan?.deviceLimit ?? user.deviceLimit,
-        subscriptionExpiresAt: new Date(
-          (subscription as unknown as { current_period_end: number }).current_period_end * 1000,
-        ),
+        subscriptionExpiresAt: (subscription as any).current_period_end
+          ? new Date((subscription as any).current_period_end * 1000)
+          : null,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
       },
     );
