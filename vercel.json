@@ -8,6 +8,13 @@
   ],
   "routes": [
     {
+      "src": "/billing/webhook",
+      "dest": "dist/main.js",
+      "headers": {
+        "content-type": "application/json"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "dist/main.js"
     }

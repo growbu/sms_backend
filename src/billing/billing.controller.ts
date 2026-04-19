@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  RawBody,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -96,9 +95,27 @@ export class BillingController {
   @Post('webhook')
   @HttpCode(HttpStatus.OK)
   async handleWebhook(
-    @RawBody() rawBody: Buffer,
+    @Req() req: Request,
     @Headers('stripe-signature') signature: string,
   ) {
+    // Extract raw body — priority chain for different environments:
+    // 1. req.rawBody (NestJS rawBody: true mode, works locally)
+    // 2. req.body as string (Vercel may pass the unparsed body as a string)
+    // 3. req.body as Buffer (some configurations pass Buffer directly)
+    let rawBody: string | Buffer;
+
+    if ((req as any).rawBody) {
+      rawBody = (req as any).rawBody;
+    } else if (typeof req.body === 'string') {
+      rawBody = req.body;
+    } else if (Buffer.isBuffer(req.body)) {
+      rawBody = req.body;
+    } else {
+      // Last resort — Vercel pre-parsed JSON; re-serialize.
+      // NOTE: This may fail signature verification if whitespace differs.
+      rawBody = JSON.stringify(req.body);
+    }
+
     await this.billingService.handleWebhook(rawBody, signature);
     return { received: true };
   }

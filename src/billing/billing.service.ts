@@ -195,7 +195,7 @@ export class BillingService {
 
   // ─── Webhook Handler ──────────────────────────────────────────────
 
-  async handleWebhook(rawBody: Buffer, signature: string): Promise<void> {
+  async handleWebhook(rawBody: string | Buffer, signature: string): Promise<void> {
     const webhookSecret = this.configService.get<string>(
       'STRIPE_WEBHOOK_SECRET',
     );
