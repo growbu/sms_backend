@@ -139,6 +139,59 @@ export class ApiKeysService {
     return apiKey;
   }
 
+  // ─── Verify Key (public check — no auth required) ─────────────────
+
+  async verifyKey(rawKey: string): Promise<{
+    valid: boolean;
+    reason: string | null;
+    keyInfo: {
+      name: string;
+      prefix: string;
+      scopes: string[];
+      rateLimitPerMinute: number | null;
+      expiresAt: Date | null;
+    } | null;
+  }> {
+    const apiKey = await this.validateKey(rawKey);
+
+    if (!apiKey) {
+      return { valid: false, reason: 'API key not found', keyInfo: null };
+    }
+
+    if (apiKey.revokedAt) {
+      return { valid: false, reason: 'API key has been revoked', keyInfo: null };
+    }
+
+    if (!apiKey.isActive) {
+      return { valid: false, reason: 'API key is inactive', keyInfo: null };
+    }
+
+    if (apiKey.expiresAt && new Date() > apiKey.expiresAt) {
+      return { valid: false, reason: 'API key has expired', keyInfo: null };
+    }
+
+    const canSendMessages = apiKey.scopes.includes('messages:send');
+    if (!canSendMessages) {
+      return {
+        valid: false,
+        reason: 'API key does not have the "messages:send" scope',
+        keyInfo: null,
+      };
+    }
+
+    return {
+      valid: true,
+      reason: null,
+      keyInfo: {
+        name: apiKey.name,
+        prefix: apiKey.prefix,
+        scopes: apiKey.scopes,
+        rateLimitPerMinute: apiKey.rateLimitPerMinute,
+        expiresAt: apiKey.expiresAt,
+      },
+    };
+  }
+
   /**
    * Record that the key was used: update lastUsedAt, lastUsedIp,
    * and increment requestCount.

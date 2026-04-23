@@ -16,6 +16,8 @@ import {
   UpdateMessageStatusDto,
   QueryMessagesDto,
 } from './dto/index.js';
+import { ApiKeysService } from '../api-keys/api-keys.service.js';
+import { VerifyApiKeyDto } from '../api-keys/dto/index.js';
 
 // Guards
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -35,7 +37,22 @@ type ApiKeyRequest = Request & ApiKeyRequestContext;
 
 @Controller('messages')
 export class MessagesController {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly apiKeysService: ApiKeysService,
+  ) {}
+
+  // ─── POST /messages/verify-key (public — no auth required) ─────────
+
+  @Post('verify-key')
+  @HttpCode(HttpStatus.OK)
+  async verifyKey(@Body() dto: VerifyApiKeyDto) {
+    const result = await this.apiKeysService.verifyKey(dto.apiKey);
+    return {
+      statusCode: HttpStatus.OK,
+      data: result,
+    };
+  }
 
   // ─── POST /messages/send (API key protected) ────────────────────────
 
